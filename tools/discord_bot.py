@@ -48,19 +48,19 @@ async def on_message(message):
     # Only handle DMs from the target user
     if isinstance(message.channel, discord.DMChannel) and message.author.id == TARGET_USER_ID:
 
-        if latest_question != "":
-            answer = message
+        if latest_question != "":  # handle user's answer
+            answer = message.content
             evaluator_result = evaluator.app.invoke({'question': latest_question, 'answer': answer})
             await message.channel.send(evaluator_result["evaluation"])
 
-        if question_index < number_of_questions:
+        if question_index < number_of_questions:  # proceed to the next question
             examiner_result = examiner.app.invoke({})
             await message.channel.send(examiner_result["question"])
             latest_question = examiner_result["question"]
             question_index += 1
         else:
             await message.channel.send("Thanks for answering all the questions!")
-            await client.close()  # Instead of exit()
+            await client.close()
 
 
 if __name__ == '__main__':
