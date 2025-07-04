@@ -1,11 +1,15 @@
 from typing import Dict, TypedDict
 from langgraph.graph import StateGraph
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 class AgentState(TypedDict):
     question: str
     answer: str
     dialogue: str
+    evaluation: str
 
 
 def evaluate_node(state: AgentState) -> AgentState:

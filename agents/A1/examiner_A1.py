@@ -47,16 +47,20 @@ class AgentState(TypedDict):
 
 
 def question_node(state: AgentState) -> AgentState:
-    """Simple node that creates a question for the user using the retriever of the Italian dialogues file"""
+    """Node that creates a question using relevant dialogue chunks from the retriever"""
 
-    chosen = random.choice(dialogue_chunks)
+    # Get relevant chunks
+    retrieved_docs = retriever.invoke("Italian dialogue for beginners")
+
+    if retrieved_docs:
+        chosen = random.choice(retrieved_docs).page_content
+    else:
+        chosen = random.choice(dialogue_chunks)  # fallback
 
     prompt = question_prompt.format(dialogue=chosen)
-    generated = llm.predict(prompt)
+    generated = llm.invoke(prompt).content  # Using invoke() instead of predict()
 
-    # Save generated question
     state["question"] = generated.strip()
-
     return state
 
 
