@@ -5,7 +5,7 @@ from langgraph.graph import StateGraph
 class AgentState(TypedDict):
     question: str
     answer: str
-    evaluation: str
+    dialogue: str
 
 
 def evaluate_node(state: AgentState) -> AgentState:

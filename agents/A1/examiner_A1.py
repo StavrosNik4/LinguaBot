@@ -19,12 +19,12 @@ dialogue_chunks = chunk_by_dialogue(file_path)
 
 docs = [Document(page_content=chunk) for chunk in dialogue_chunks]
 
-embedding_model = OpenAIEmbeddings()
+embedding_model = OpenAIEmbeddings(model="text-embedding-3-small")
 vectorstore = Chroma.from_documents(docs, embedding_model)
 retriever = vectorstore.as_retriever()
 
 # === LLM for question generation ===
-llm = ChatOpenAI(temperature=0.7)
+llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.7)
 
 # === Prompt Template ===
 question_prompt = PromptTemplate.from_template(

@@ -1,9 +1,8 @@
 import discord
-import asyncio
 from dotenv import load_dotenv
 import os
 
-from agents import examiner, evaluator
+from agents.A1 import evaluator_A1, examiner_A1
 
 load_dotenv()
 
@@ -31,7 +30,7 @@ async def on_ready():
     user = await client.fetch_user(TARGET_USER_ID)
 
     try:
-        result = examiner.app.invoke({})
+        result = examiner_A1.app.invoke({})
         await user.send(result["question"])
         latest_question = result["question"]
         question_index = 1  # Next question to ask
@@ -50,11 +49,11 @@ async def on_message(message):
 
         if latest_question != "":  # handle user's answer
             user_answer = message.content
-            evaluator_result = evaluator.app.invoke({'question': latest_question, 'answer': user_answer})
+            evaluator_result = evaluator_A1.app.invoke({'question': latest_question, 'answer': user_answer})
             await message.channel.send(evaluator_result["evaluation"])
 
         if question_index < number_of_questions:  # proceed to the next question
-            examiner_result = examiner.app.invoke({})
+            examiner_result = examiner_A1.app.invoke({})
             await message.channel.send(examiner_result["question"])
             latest_question = examiner_result["question"]
             question_index += 1
