@@ -1,3 +1,7 @@
 discord
 dotenv
 langgraph
+langchain
+langchain_openai
+langchain_community
+langchain_chroma

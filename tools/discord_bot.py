@@ -7,7 +7,7 @@ from agents import examiner, evaluator
 
 load_dotenv()
 
-TOKEN = os.getenv("TOKEN")
+TOKEN = os.getenv("DISCORD_TOKEN")
 TARGET_USER_ID = int(os.getenv("TARGET_USER_ID"))
 
 intents = discord.Intents.default()
@@ -49,8 +49,8 @@ async def on_message(message):
     if isinstance(message.channel, discord.DMChannel) and message.author.id == TARGET_USER_ID:
 
         if latest_question != "":  # handle user's answer
-            answer = message.content
-            evaluator_result = evaluator.app.invoke({'question': latest_question, 'answer': answer})
+            user_answer = message.content
+            evaluator_result = evaluator.app.invoke({'question': latest_question, 'answer': user_answer})
             await message.channel.send(evaluator_result["evaluation"])
 
         if question_index < number_of_questions:  # proceed to the next question

@@ -1,0 +1,20 @@
+<dialogue>
+Marco: Hi, Anna! How are you?
+Anna: Hi, Marco! I'm good, thanks. And you?
+Marco: All good, thanks. Do you want to have a coffee?
+Anna: Yes, gladly! I really feel like having a cappuccino.
+Marco: Perfect! Shall we go to the café nearby?
+Anna: Yes, it’s a good café. They also have very good croissants.
+(They enter the café and sit down)
+Waiter: Good morning! What would you like?
+Marco: A coffee, please.
+Anna: For me, a cappuccino and a cream croissant.
+Waiter: Right away!
+Marco: So, how’s work?
+Anna: Good! I work a lot, but I like it. And you? Are you still studying?
+Marco: Yes, I study computer science at university.
+Anna: That’s great! Do you like it?
+Marco: Yes, very much. It’s interesting but also difficult.
+Waiter: Here’s the coffee, the cappuccino, and the croissant. Have a good day!
+Anna and Marco: Thank you!
+</dialogue>
