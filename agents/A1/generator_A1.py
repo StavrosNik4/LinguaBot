@@ -89,10 +89,14 @@ app = graph.compile()
 # === Loop N times to create N dialogues ===
 
 all_dialogues = []
+all_topics = []
 
 for i in range(0, 5):
-    result_dialogue = app.invoke({})["dialogue"]
+    result = app.invoke({})
+    result_dialogue = result["dialogue"]
+    result_topic = result["topic"]
     all_dialogues.append(result_dialogue)
+    all_topics.append(result_topic)
 
 # === Call the function to save the dialogue ===
-save_multiple_dialogues_to_pdf(all_dialogues, filename=file_path)
+save_multiple_dialogues_to_pdf(all_dialogues, all_topics, filename=file_path)

@@ -30,28 +30,36 @@ def save_dialogue_to_pdf(text, filename):
     doc.build(story)
 
 
-def save_multiple_dialogues_to_pdf(dialogues, filename):
+def save_multiple_dialogues_to_pdf(dialogues, topics, filename):
     """
     Saves a list of dialogues (each as a string) to a PDF,
-    with each dialogue separated by a title/header.
+    with each dialogue separated by a title/header that includes its topic.
+
+    Parameters:
+        dialogues (list of str): List of dialogues (each a multiline string).
+        topics (list of str): List of topics (same length as dialogues).
+        filename (str): Output PDF file path.
     """
+    if len(dialogues) != len(topics):
+        raise ValueError("The number of topics must match the number of dialogues.")
+
     doc = SimpleDocTemplate(filename, pagesize=A4)
     styles = getSampleStyleSheet()
     story = []
 
-    for i, dialogue in enumerate(dialogues, 1):
-        # Add a title for each dialogue
-        title = Paragraph(f"<b>Dialogue {i}</b>", styles["Heading2"])
+    for i, (dialogue, topic) in enumerate(zip(dialogues, topics), 1):
+        # Title with dialogue number and topic
+        title_text = f"<b>Dialogue {i} - Topic: {topic}</b>"
+        title = Paragraph(title_text, styles["Heading2"])
         story.append(title)
         story.append(Spacer(1, 12))
 
-        # Add each line of the dialogue as a paragraph
+        # Each line of the dialogue
         for line in dialogue.strip().split("\n"):
             if line.strip():  # skip empty lines
                 story.append(Paragraph(line.strip(), styles["Normal"]))
                 story.append(Spacer(1, 6))
 
-        # Add space between dialogues
-        story.append(Spacer(1, 24))
+        story.append(Spacer(1, 24))  # Extra space between dialogues
 
     doc.build(story)
