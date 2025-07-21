@@ -1,2 +1,2 @@
-# LinguaRAG
-A Retrieval-Augmented Generation (RAG) agent that processes PDF files containing Italian dialogues. After the user reads or listens to the dialogue, the agent generates critical thinking questions related to the content. The user responds in natural language, and the agent evaluates their answers based on comprehension, reasoning, and language use.
+# LinguaBot
+A Discord bot that helps users learn Italian by generating dialogues and reading materials. It engages the user through interactive exercises, asks comprehension or vocabulary questions based on the content, collects the user's responses, and then evaluates their answers to provide feedback and track progress. e.
