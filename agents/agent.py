@@ -9,15 +9,14 @@ from langgraph.graph import StateGraph
 load_dotenv()
 
 # === LLM for dialogues generation ===
-llm_generator = ChatOpenAI(model="gpt-4o-mini", temperature=0.7)
+llm_generator = ChatOpenAI(model="gpt-4o-mini", temperature=0.9, presence_penalty=0.1)
 llm_questioner = ChatOpenAI(model="gpt-4o-mini", temperature=0.1)
 
 # === Prompt Template ===
 generation_prompt = PromptTemplate.from_template(
     """You are a dialogue generator for Italian reading material intended for reading comprehension tests.
 You must create a medium size dialogue between 2 or more characters. You must only provide the dialogue,
-not the characters or the topic, but you must specify who is talking by giving their name before their lines. Also, do 
-not only produce default dialogues like 2 people meeting each other, there must be a topic. 
+not the characters or the topic, but you must specify who is talking by giving their name before their lines.
 
 The dialogue must:
 - Be in Italian only
@@ -25,6 +24,7 @@ The dialogue must:
 - not have empty lines
 - have 2 or more characters
 - have this topic: {topic}
+- not only produce default dialogues like 2 people meeting each other, there must be diversity
 
 Dialogue:"""
 )

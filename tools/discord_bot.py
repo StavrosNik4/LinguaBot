@@ -35,7 +35,7 @@ async def on_ready():
         dialogue = agent_result["dialogue"]
         await user.send(dialogue)
 
-        question = agent_result["question"]
+        question = "**" + agent_result["question"] + "**"
         await user.send(question)
 
         topic = agent_result["topic"]
