@@ -2,7 +2,7 @@ import discord
 from dotenv import load_dotenv
 import os
 
-from agents.A1 import evaluator_A1, examiner_A1
+from agents import agent, evaluator
 
 load_dotenv()
 
@@ -15,48 +15,55 @@ intents.dm_messages = True  # Needed for DMs
 
 client = discord.Client(intents=intents)
 
-number_of_questions = 5
-
 # Tracking user progress
+number_of_questions = 5
 question_index = 0
 
-latest_question = ""
+question = ""
+dialogue = ""
+topic = ""
 
 
 @client.event
 async def on_ready():
-    global question_index, latest_question
+    global question_index, question, dialogue, topic
     print(f'Logged in as {client.user}')
     user = await client.fetch_user(TARGET_USER_ID)
 
     try:
-        result = examiner_A1.app.invoke({})
-        await user.send(result["question"])
-        latest_question = result["question"]
-        question_index = 1  # Next question to ask
+        agent_result = agent.app.invoke({})
+        dialogue = agent_result["dialogue"]
+        await user.send(dialogue)
+
+        question = agent_result["question"]
+        await user.send(question)
+
+        topic = agent_result["topic"]
+
+        question_index = 1
     except Exception as e:
         print(f"Failed to send first question: {e}")
 
 
 @client.event
 async def on_message(message):
-    global question_index, latest_question
-    if message.author.bot:  # if message from evaluator
+    global question_index, question
+    if message.author.bot:  # if message from generator, examiner or evaluator
         return
 
     # Only handle DMs from the target user
     if isinstance(message.channel, discord.DMChannel) and message.author.id == TARGET_USER_ID:
 
-        if latest_question != "":  # handle user's answer
+        if question != "":  # handle user's answer
             user_answer = message.content
-            evaluator_result = evaluator_A1.app.invoke({'question': latest_question, 'answer': user_answer})
+            evaluator_result = evaluator.app.invoke(
+                {'dialogue': dialogue, 'question': question, 'answer': user_answer, 'topic': topic})
             await message.channel.send(evaluator_result["evaluation"])
 
         if question_index < number_of_questions:  # proceed to the next question
-            examiner_result = examiner_A1.app.invoke({})
-            await message.channel.send(examiner_result["question"])
-            latest_question = examiner_result["question"]
+            # TODO
             question_index += 1
+            pass
         else:
             await message.channel.send("Thanks for answering all the questions!")
             await client.close()

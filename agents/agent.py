@@ -6,14 +6,11 @@ from langchain_core.prompts import PromptTemplate
 from langchain_openai import ChatOpenAI
 from langgraph.graph import StateGraph
 
-from tools.file_processing import save_multiple_dialogues_to_pdf
-
 load_dotenv()
 
-file_path = "../../dialogues/A1.pdf"
-
 # === LLM for dialogues generation ===
-llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.7)
+llm_generator = ChatOpenAI(model="gpt-4o-mini", temperature=0.7)
+llm_questioner = ChatOpenAI(model="gpt-4o-mini", temperature=0.1)
 
 # === Prompt Template ===
 generation_prompt = PromptTemplate.from_template(
@@ -26,6 +23,7 @@ The dialogue must:
 - Be in Italian only
 - Be suitable for A1 level learners
 - not have empty lines
+- have 2 or more characters
 - have this topic: {topic}
 
 Dialogue:"""
@@ -59,9 +57,24 @@ topics = [
     "at the supermarket"
 ]
 
+question_prompt = PromptTemplate.from_template(
+    """You are an examiner for Italian reading comprehension tests. 
+Read this Italian dialogue (with {topic} topic) and create one comprehension question in Italian:
+{dialogue}
+
+The question must:
+- Be in Italian only
+- Not be a riddle or tricky question
+- Be directly answerable from the dialogue
+- Be suitable for A1 level learners
+
+Question:"""
+)
+
 
 class AgentState(TypedDict):
     dialogue: str
+    question: str
     topic: str
 
 
@@ -70,7 +83,7 @@ def dialogue_generation_node(state: AgentState) -> AgentState:
 
     topic_index = random.randint(0, len(topics))
     topic = topics[topic_index]
-    generated = llm.invoke(generation_prompt.format(topic=topic)).content
+    generated = llm_generator.invoke(generation_prompt.format(topic=topic)).content
 
     state["dialogue"] = generated.strip()
     state["topic"] = topic
@@ -78,25 +91,22 @@ def dialogue_generation_node(state: AgentState) -> AgentState:
     return state
 
 
+def question_node(state: AgentState) -> AgentState:
+    """Node that creates a question using relevant dialogue chunks from the retriever"""
+
+    prompt = question_prompt.format(dialogue=state["dialogue"], topic=state["topic"])
+    generated = llm_questioner.invoke(prompt).content
+
+    state["question"] = generated.strip()
+    return state
+
+
 # === Graph construction ===
 graph = StateGraph(AgentState)
 graph.add_node("dialogue_gen", dialogue_generation_node)
+graph.add_node("question_node", question_node)
 graph.set_entry_point("dialogue_gen")
-graph.set_finish_point("dialogue_gen")
+graph.add_edge("dialogue_gen", "question_node")
+graph.set_finish_point("question_node")
 
 app = graph.compile()
-
-# === Loop N times to create N dialogues ===
-
-all_dialogues = []
-all_topics = []
-
-for i in range(0, 5):
-    result = app.invoke({})
-    result_dialogue = result["dialogue"]
-    result_topic = result["topic"]
-    all_dialogues.append(result_dialogue)
-    all_topics.append(result_topic)
-
-# === Call the function to save the dialogue ===
-save_multiple_dialogues_to_pdf(all_dialogues, all_topics, filename=file_path)
